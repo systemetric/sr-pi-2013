@@ -1,7 +1,7 @@
-import cereal
+import serial
 import time
 
-mbedComms = cereal.Cereal('/dev/ttyACM0', 115200)
+mbedComms = serial.Serial('/dev/ttyACM0', 115200)
 
 print("Setting motor 0 to 100 power!")
 
