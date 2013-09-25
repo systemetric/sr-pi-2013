@@ -3,10 +3,10 @@ import time
 
 mbedComms = serial.Serial('/dev/ttyACM0', 115200)
 
-print("Setting motor 0 to 100 power!")
+print("Setting motor 0 to 50 power!")
 
 # tell mbed to set motor 0 to 100 power
-mbedComms.write('M0(100)')
+mbedComms.write('M0(50)')
 # flush the message down the wire
 mbedComms.flush()
 # listen for a byte of acknowledgement
