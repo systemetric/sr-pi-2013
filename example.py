@@ -12,7 +12,7 @@ mbedComms.flush()
 # listen for a byte of acknowledgement
 mbedComms.read(1)
 
-time.sleep(1)
+time.sleep(2)
 
 print("Setting motor 0 to 0 power!")
 
