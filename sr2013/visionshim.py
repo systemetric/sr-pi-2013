@@ -17,13 +17,16 @@ class VisionShim(vision.Vision):
             raise RuntimeError("Camera not found")
 
         # Find libsric.so:
-        if "LD_LIBRARY_PATH" in os.environ:
+        if libpath is None and  "LD_LIBRARY_PATH" in os.environ:
             for d in os.environ["LD_LIBRARY_PATH"].split(":"):
                 l = glob.glob( "%s/libkoki.so*" % os.path.abspath( d ) )
 
                 if len(l):
                     libpath = os.path.abspath(d)
                     break
+
+        if libpath is None:
+            raise RuntimeError("libkoki not found")
         super(VisionShim, self).__init__(device, libpath)
 
 
