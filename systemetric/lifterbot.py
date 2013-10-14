@@ -33,4 +33,4 @@ class LifterBot(Robot):
         self.leftMotor = MotorMbed(self.mbed, 0)
         self.rightMotor = MotorMbed(self.mbed, 1)
 
-        super(Robot, self).__init__(mode)
+        super(LifterBot, self).__init__(mode)
