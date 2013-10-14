@@ -24,6 +24,6 @@ class VisionShim(vision.Vision):
                 if len(l):
                     libpath = os.path.abspath(d)
                     break
-        self.__init__(device, libpath)
+        super(VisionShim, self).__init__(device, libpath)
 
 
