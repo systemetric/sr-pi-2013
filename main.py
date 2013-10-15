@@ -6,7 +6,13 @@ import math
 
 def PickAndPlinth():
     R = PacBot("comp")
-    arena_list, robot_list, pedestal_list, cube_list = sortMarkers(R.see())
+    markers = R.see()
+    print("Saw {} markers" % len(markers))
+    arena_list, robot_list, pedestal_list, cube_list = sortMarkers()
+    if len(cube_list) == 0:
+        print("No cubes seen")
+        return
+    print("Seen a cube")
     MovementTarget = markerDistance(cube_list[0])
     R.moveForward(MovementTarget[1])
     if MovementTarget[0] < -0.2:
