@@ -1,14 +1,14 @@
 class Arm(object):
     def __init__(self, mbed):
         self._mbed = mbed
-        self.lifted = False
+        self.state = 0
 
-    def setLifted(self, lifted, timeout=10.0):
+    def setArmState(self, state, timeout=10.0):
         """Moves the arm to a specified state.
 
-        :param lifted: whether the arm should be lifted (True) or
+        :param state: whether the arm should be state (True) or
                        lowered (False)
-        :type lifted: bool
+        :type state: bool
         :param timeout: the amount of time after which the operation
                         should time out and raise an exception.
         :type timeout: float or None
@@ -16,7 +16,7 @@ class Arm(object):
         :raises: mbed.Timeout -- if the arm failed to move to the
                                  specified state in time
         """
-        if self.lifted != lifted:
-            self._mbed.sendCommand('A' + int(lifted), timeout=timeout)
-            self.lifted = lifted
+        if self.state != state:
+            self._mbed.sendCommand('A' + int(state), timeout=timeout)
+            self.state = state
         return True
