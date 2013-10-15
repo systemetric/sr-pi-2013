@@ -8,9 +8,12 @@ class PacBot(Robot):
         self.rightMotor = MotorMbed(self.mbed, 1)
         self.motorDriver = BlindMotorDriver(self.leftMotor, self.rightMotor,
                                             1, 1, 1, 1) #right, left, dist, turn
+        self.arm = Arm(self.mbed)
 
-        super(LifterBot, self).__init__(mode)
+        super(PacBot, self).__init__(mode)
     def turn(angle):
         self.motorDriver.turn(angle)
     def moveForward(distance):
         self.motorDriver.moveForward(distance)
+    def setArmState(state):
+        self.arm.setArmState(state)
