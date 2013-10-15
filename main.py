@@ -58,7 +58,7 @@ def sortMarkers(markerList):
             pedestal_list.append(marker)
         if marker.info.marker_type == MARKER_TOKEN:
             cubes_list.append(marker)
-    return arena_list, robot_list, pedestal_list, cube_list
+    return arena_list, robot_list, pedestal_list, cubes_list
     
 def pickUpCube():
     """Moves the arm down to the cube and sucks up the cube then raises the arm"""
