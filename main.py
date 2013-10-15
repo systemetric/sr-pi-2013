@@ -8,7 +8,7 @@ def PickAndPlinth():
     R = PacBot("comp")
     markers = R.see()
     print("Saw {} markers".format(len(markers)))
-    arena_list, robot_list, pedestal_list, cube_list = sortMarkers()
+    arena_list, robot_list, pedestal_list, cube_list = sortMarkers(markers)
     if len(cube_list) == 0:
         print("No cubes seen")
         return
