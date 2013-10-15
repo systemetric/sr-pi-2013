@@ -1,7 +1,7 @@
 import time
 class BlindMotorDriver(object):
 	def __init__(self, mbed, leftMotor, rightMotor, 
-	leftMotorFactor=1, rightMotorFactor=1, distanceCalibration, turnCalibration):
+	leftMotorFactor=1, rightMotorFactor=1, distanceCalibration=1, turnCalibration=1):
 		self._mbed = mbed
 		self._motorR = rightMotor
 		self._motorL = leftMotor
