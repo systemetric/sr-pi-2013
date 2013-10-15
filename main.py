@@ -1,14 +1,15 @@
-from sr import *
+from systemetric import *
+from sr2013 import *
 import time
-import serial
 import math
 speed = 1
-turncalibration = 1 """Use these two to calibrate movement"""
+# Use these two to calibrate movement
+turncalibration = 1
 distancecalibration = 1
 
 
 def PickAndPlinth():
-    R = Robot()
+    R = PacBot()
     arena_list, robot_list, pedestal_list, cube_list = sortMarkers(R.See())
     MovementTarget = markerDistance(cube_list[0])
     R.moveForward(MovementTarget[1])
@@ -70,6 +71,6 @@ def pickUpCube():
     R.setArmState(0)
 def dropCube():
     """Releases cube"""
-    pump(False)
+    R.setPumpState(False)
     
 PickAndPlinth()
