@@ -41,8 +41,8 @@ def markerDistance(marker):
     sideDist = 0
     totalDist = 0
     p = marker.centre
-    forwardDist = math.sin(p.polar.rot_x * math.PI / 180.)*p.polar.length
-    sideDist = math.cos(mp.polar.rot_x * math.PI / 180.)*p.polar.length
+    forwardDist = math.sin(math.radians(p.polar.rot_x))*p.polar.length
+    sideDist = math.cos(math.radians(p.polar.rot_x))*p.polar.length
     totalDist = sideDist+forwardDist
     return sideDist, forwardDist, totalDist
 
