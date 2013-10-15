@@ -7,3 +7,5 @@ Use these in the Raspberry Pi robots.
 
 from mbed import Mbed, MbedTimeout
 from motor import MotorMbed
+from arm import Arm
+from pump import Pump
