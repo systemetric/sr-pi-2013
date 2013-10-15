@@ -9,7 +9,7 @@ distancecalibration = 1
 
 
 def PickAndPlinth():
-    R = PacBot()
+    R = PacBot("comp")
     arena_list, robot_list, pedestal_list, cube_list = sortMarkers(R.See())
     MovementTarget = markerDistance(cube_list[0])
     R.moveForward(MovementTarget[1])
