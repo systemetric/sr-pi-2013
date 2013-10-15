@@ -2,15 +2,11 @@ from systemetric import *
 from sr2013 import *
 import time
 import math
-speed = 1
-# Use these two to calibrate movement
-turncalibration = 1
-distancecalibration = 1
 
 
 def PickAndPlinth():
     R = PacBot("comp")
-    arena_list, robot_list, pedestal_list, cube_list = sortMarkers(R.See())
+    arena_list, robot_list, pedestal_list, cube_list = sortMarkers(R.see())
     MovementTarget = markerDistance(cube_list[0])
     R.moveForward(MovementTarget[1])
     if MovementTarget[0] < -0.2:
