@@ -7,7 +7,7 @@ import math
 def PickAndPlinth():
     R = PacBot("comp")
     markers = R.see()
-    print("Saw {} markers" % len(markers))
+    print("Saw {} markers".format(len(markers)))
     arena_list, robot_list, pedestal_list, cube_list = sortMarkers()
     if len(cube_list) == 0:
         print("No cubes seen")
@@ -74,5 +74,6 @@ def pickUpCube():
 def dropCube():
     """Releases cube"""
     R.setPumpState(False)
-    
-PickAndPlinth()
+
+while True:
+    PickAndPlinth()
