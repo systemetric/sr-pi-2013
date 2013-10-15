@@ -9,3 +9,8 @@ class MotorMbed(object):
         self._mbed = mbed
         self._motorId = motorId
 
+    def setPower(self, power):
+        """Changes the motor power to state
+        Input: motorID, state"""
+        self._mbed.sendCommand('M{}({})'.format(self._motorId, power))
+        
