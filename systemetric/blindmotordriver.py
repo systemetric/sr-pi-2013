@@ -1,7 +1,8 @@
 import time
 class BlindMotorDriver(object):
     def __init__(self, mbed, leftMotor, rightMotor, 
-    leftMotorFactor=1, rightMotorFactor=1, distanceCalibration=1, turnCalibration=1):
+                 leftMotorFactor=1, rightMotorFactor=1,
+                 distanceCalibration=1, turnCalibration=1):
         self._mbed = mbed
         self._motorR = rightMotor
         self._motorL = leftMotor
@@ -23,8 +24,8 @@ class BlindMotorDriver(object):
                 self.motorL.setPower(-100*leftMotorFactor)
             time.sleep(distance*self.distanceCalibration)
         finally:
-        self.motorR.setPower(0)
-        self.motorL.setPower(0)
+            self.motorR.setPower(0)
+            self.motorL.setPower(0)
     def turn(self, angle):    
         """Turns the robots a set angle assuming it takes 1s to turn 90    
         input: angle"""
@@ -36,8 +37,10 @@ class BlindMotorDriver(object):
         if angle < 0:        
             angle = -angle
             direction = -1
-        self.motorR.setPower(direction*100*rightMotorFactor)    
-        self.motorL.setPower(direction*100*leftMotorFactor)   
-        time.sleep(self.turnCalibration*angle/90.)
-        self.motorR.setPower(0)    
-        self.motorL.setPower(0)
+        try:
+            self.motorR.setPower(direction*100*rightMotorFactor)    
+            self.motorL.setPower(direction*100*leftMotorFactor)   
+            time.sleep(self.turnCalibration*angle/90.)
+        finally:
+            self.motorR.setPower(0)    
+            self.motorL.setPower(0)
