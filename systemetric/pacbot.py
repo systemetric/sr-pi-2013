@@ -1,4 +1,6 @@
 from robot import Robot
+from sr2013 import VisionShim
+from devices import Mbed, MotorMbed, Arm, Pump
 
 class PacBot(Robot):
     def __init__(self, mode):
@@ -9,6 +11,7 @@ class PacBot(Robot):
         self.motorDriver = BlindMotorDriver(self.leftMotor, self.rightMotor,
                                             1, 1, 1, 1) #right, left, dist, turn
         self.arm = Arm(self.mbed)
+        self.pump = Pump(self.mbed)
 
         super(PacBot, self).__init__(mode)
     def turn(angle):
