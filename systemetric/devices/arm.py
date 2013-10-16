@@ -17,6 +17,6 @@ class Arm(object):
                                  specified state in time
         """
         if self.state != state:
-            self._mbed.sendCommand('A' + int(state), timeout=timeout)
+            self._mbed.sendCommand('A' + str(int(state)), timeout=timeout)
             self.state = state
         return True
