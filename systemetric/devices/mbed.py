@@ -31,6 +31,7 @@ class Mbed(object):
 
         self.serial = serial.Serial(device, baudrate)
         self._lock = threading.Lock()
+        self.serial.flushInput()
 
     def __str__(self):
         return "<mbed at '{}', {} baud rate>" \
