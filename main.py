@@ -6,13 +6,13 @@ import math
 R = PacBot("comp")
 
 
-def PickAndPlinth():
+def Pick():
     markers = R.see()
     print("Saw {} markers".format(len(markers)))
     arena_list, robot_list, pedestal_list, cube_list = sortMarkers(markers)
     if len(cube_list) == 0:
         print("No cubes seen")
-        return
+        return False
     print("Seen a cube")
     MovementTarget = markerDistance(cube_list[0])
     R.moveForward(MovementTarget[1])
@@ -23,6 +23,16 @@ def PickAndPlinth():
         R.turn(90)
         R.moveForward(MovementTarget[0])
     pickUpCube()
+    return True
+
+def Plinth():
+    markers = R.see()
+    print("Saw {} markers".format(len(markers)))
+    arena_list, robot_list, pedestal_list, cube_list = sortMarkers(markers)
+    if len(pedestal_list) == 0:
+        print("No pedestals seen")
+        return False
+    print("Seen a pedestal")
     PlinthTarget = markerDistance(pedestal_list[0])
     AdjustedMovement = (PlinthTarget[0]-MovementTarget[0], PlinthTarget[1]-MovementTarget[1])
     R.moveForward(AdjustedMovement[1])
@@ -33,6 +43,7 @@ def PickAndPlinth():
         R.turn(90)
         R.moveForward(AdjustedMovement[0])
     dropCube()
+    return True
     
 def markerDistance(marker):
     """Finds the relative forwards and sideways distance to a marker
@@ -76,5 +87,5 @@ def dropCube():
     """Releases cube"""
     R.setPumpState(False)
 
-while True:
-    PickAndPlinth()
+while not Pick(): pass
+while not Plinth(): pass
