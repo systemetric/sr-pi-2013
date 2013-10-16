@@ -17,6 +17,6 @@ class Pump(object):
                                  specified state in time
         """
         if self.state != state:
-            self._mbed.sendCommand('P' + int(state), timeout=timeout)
+            self._mbed.sendCommand('P' + str(int(state)), timeout=timeout)
             self.state = state
         return True
