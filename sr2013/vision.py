@@ -125,8 +125,9 @@ class Vision(object):
         self.lock.release()
 
     def __del__(self):
-        self._stop()
-        self.koki.v4l_close_cam(self.fd)
+        if hasattr(self, "koki"):
+            self._stop()
+            self.koki.v4l_close_cam(self.fd)
 
     def _init_focal_length(self):
         vendor_product_re = re.compile(".* ([0-9A-Za-z]+):([0-9A-Za-z]+) ")
