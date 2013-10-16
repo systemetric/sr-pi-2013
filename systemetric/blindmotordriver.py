@@ -7,7 +7,7 @@ class BlindMotorDriver(object):
         self.motorL = leftMotor
         self.rightMotorFactor = rightMotorFactor
         self.leftMotorFactor = leftMotorFactor
-        self.distancecalibration = distanceCalibration
+        self.distanceCalibration = distanceCalibration
         self.turnCalibration = turnCalibration
     def moveForward(self, distance):    
         """Moves the robot forwards a set amount of time
