@@ -38,7 +38,7 @@ class BlindMotorDriver(object):
             direction = -1
         try:
             self.motorR.setPower(direction*100*self.rightMotorFactor)    
-            self.motorL.setPower(direction*100*self.leftMotorFactor)   
+            self.motorL.setPower(-direction*100*self.leftMotorFactor)   
             time.sleep(self.turnCalibration*angle/90.)
         finally:
             self.motorR.setPower(0)    
