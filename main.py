@@ -3,9 +3,10 @@ from sr2013 import *
 import time
 import math
 
+R = PacBot("comp")
+
 
 def PickAndPlinth():
-    R = PacBot("comp")
     markers = R.see()
     print("Saw {} markers".format(len(markers)))
     arena_list, robot_list, pedestal_list, cube_list = sortMarkers(markers)
