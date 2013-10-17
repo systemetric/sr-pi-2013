@@ -11,8 +11,8 @@ class BlindMotorDriver(object):
         self.turnCalibration = turnCalibration
     def moveForward(self, distance):
         """Moves the robot forwards a set amount of time
-(use negative distance for going backwards)
-input: distance"""
+           (use negative distance for going backwards)
+           input: distance"""
         try:
             if distance < 0: #if the distance is negative, it becomes positive
                 distance = -distance
@@ -27,7 +27,7 @@ input: distance"""
             self.motorL.setPower(0)
     def turn(self, angle):
         """Turns the robots a set angle assuming it takes 1s to turn 90
-input: angle"""
+           input: angle"""
         direction = 1
         while angle > 180:
             angle = angle-360
