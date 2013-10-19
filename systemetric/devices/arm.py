@@ -2,6 +2,7 @@ class Arm(object):
     def __init__(self, mbed):
         self._mbed = mbed
         self.state = 0
+        # TODO: retrieve current state from mbed
 
     def setArmState(self, state, timeout=10.0):
         """Moves the arm to a specified state.
