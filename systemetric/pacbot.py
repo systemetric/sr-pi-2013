@@ -15,11 +15,3 @@ class PacBot(Robot):
         self.pump = Pump(self.mbed)
 
         super(PacBot, self).__init__(mode)
-    def turn(self, angle):
-        self.motorDriver.turn(angle)
-    def moveForward(self, distance):
-        self.motorDriver.moveForward(distance)
-    def setArmState(self, state):
-        self.arm.setState(state)
-    def setPumpState(self, state):
-        self.pump.setState(state)
