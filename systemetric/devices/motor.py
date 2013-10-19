@@ -8,6 +8,9 @@ class MotorMbed(object):
 
         self._mbed = mbed
         self._motorId = motorId
+    
+    def __del__(self):
+        self.setPower(0)
 
     def setPower(self, power):
         """Changes the motor power to state
