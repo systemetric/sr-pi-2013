@@ -1,26 +1,11 @@
-import serial
-import time
+import sys
+sys.path.append('systemetric')
 
-mbedComms = serial.Serial('/dev/ttyACM0', 115200)
+from systemetric import LifterBot
+from sr2013.vision import MARKER_ARENA, MARKER_ROBOT, MARKER_PEDESTAL, MARKER_TOKEN
 
-print("Setting motor 0 to -100 power!")
+r = LifterBot("comp")
 
-# tell mbed to set motor 0 to 100 power
-mbedComms.write('M0(-100)')
-# flush the message down the wire
-mbedComms.flush()
-# listen for a line of acknowledgement
-mbedComms.readline()
+f = r.see()
 
-time.sleep(1)
-
-print("Setting motor 0 to 0 power!")
-
-mbedComms.write('M0(0)')
-mbedComms.flush()
-mbedComms.readline()
-
-print("Success!")
-
-# clean up
-mbedComms.close()
+print(f)
