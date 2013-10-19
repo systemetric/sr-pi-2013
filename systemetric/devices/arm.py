@@ -1,10 +1,10 @@
 class Arm(object):
     def __init__(self, mbed):
         self._mbed = mbed
-        self.state = 0
-        # TODO: retrieve current state from mbed
+        self.state = None
+        # TODO: retrieve/set initial state
 
-    def setArmState(self, state, timeout=10.0):
+    def setState(self, state, timeout=10.0):
         """Moves the arm to a specified state.
 
         :param state: whether the arm should be state (True) or
