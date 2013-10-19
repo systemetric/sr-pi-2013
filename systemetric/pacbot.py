@@ -20,6 +20,6 @@ class PacBot(Robot):
     def moveForward(self, distance):
         self.motorDriver.moveForward(distance)
     def setArmState(self, state):
-        self.arm.setArmState(state)
+        self.arm.setState(state)
     def setPumpState(self, state):
-        self.pump.setPumpState(state)
+        self.pump.setState(state)

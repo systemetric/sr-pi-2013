@@ -3,7 +3,7 @@ class Pump(object):
         self._mbed = mbed
         self.state = False
 
-    def setPumpState(self, state, timeout=10.0):
+    def setState(self, state, timeout=10.0):
         """Moves the Pump to a specified state.
 
         :param state: whether the Pump should be state (True) or
