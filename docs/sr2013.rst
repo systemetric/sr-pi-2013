@@ -1,0 +1,35 @@
+sr2013 Package
+==============
+
+:mod:`sr2013` Package
+---------------------
+
+.. automodule:: sr2013
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pykoki` Module
+--------------------
+
+.. automodule:: sr2013.pykoki
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`vision` Module
+--------------------
+
+.. automodule:: sr2013.vision
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`visionshim` Module
+------------------------
+
+.. automodule:: sr2013.visionshim
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
