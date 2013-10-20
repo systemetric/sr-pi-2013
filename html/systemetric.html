@@ -1,0 +1,287 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>systemetric Package &mdash; .  documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title=".  documentation" href="index.html" />
+    <link rel="next" title="devices Package" href="systemetric.devices.html" />
+    <link rel="prev" title="Systemetric sr-pi-2013 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="systemetric.devices.html" title="devices Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Systemetric sr-pi-2013 documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">.  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="systemetric-package">
+<h1>systemetric Package<a class="headerlink" href="#systemetric-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><a class="reference internal" href="#module-systemetric" title="systemetric"><tt class="xref py py-mod docutils literal"><span class="pre">systemetric</span></tt></a> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-systemetric"></span><p>Systemetric enhancements to Student Robotics API</p>
+</div>
+<div class="section" id="module-systemetric.blindmotordriver">
+<span id="blindmotordriver-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">blindmotordriver</span></tt> Module<a class="headerlink" href="#module-systemetric.blindmotordriver" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="systemetric.blindmotordriver.BlindMotorDriver">
+<em class="property">class </em><tt class="descclassname">systemetric.blindmotordriver.</tt><tt class="descname">BlindMotorDriver</tt><big>(</big><em>leftMotor</em>, <em>rightMotor</em>, <em>leftMotorFactor=1</em>, <em>rightMotorFactor=1</em>, <em>distanceCalibration=1</em>, <em>turnCalibration=1</em><big>)</big><a class="reference internal" href="_modules/systemetric/blindmotordriver.html#BlindMotorDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.blindmotordriver.BlindMotorDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="systemetric.blindmotordriver.BlindMotorDriver.moveForward">
+<tt class="descname">moveForward</tt><big>(</big><em>distance</em><big>)</big><a class="reference internal" href="_modules/systemetric/blindmotordriver.html#BlindMotorDriver.moveForward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.blindmotordriver.BlindMotorDriver.moveForward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the robot forwards a set amount of time
+(use negative distance for going backwards)
+input: distance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="systemetric.blindmotordriver.BlindMotorDriver.turn">
+<tt class="descname">turn</tt><big>(</big><em>angle</em><big>)</big><a class="reference internal" href="_modules/systemetric/blindmotordriver.html#BlindMotorDriver.turn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.blindmotordriver.BlindMotorDriver.turn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns the robots a set angle assuming it takes 1s to turn 90
+input: angle</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-systemetric.lifterbot">
+<span id="lifterbot-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">lifterbot</span></tt> Module<a class="headerlink" href="#module-systemetric.lifterbot" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="systemetric.lifterbot.LifterBot">
+<em class="property">class </em><tt class="descclassname">systemetric.lifterbot.</tt><tt class="descname">LifterBot</tt><big>(</big><em>visionMode</em><big>)</big><a class="reference internal" href="_modules/systemetric/lifterbot.html#LifterBot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.lifterbot.LifterBot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#systemetric.robot.Robot" title="systemetric.robot.Robot"><tt class="xref py py-class docutils literal"><span class="pre">systemetric.robot.Robot</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-systemetric.pacbot">
+<span id="pacbot-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">pacbot</span></tt> Module<a class="headerlink" href="#module-systemetric.pacbot" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="systemetric.pacbot.PacBot">
+<em class="property">class </em><tt class="descclassname">systemetric.pacbot.</tt><tt class="descname">PacBot</tt><big>(</big><em>visionMode</em><big>)</big><a class="reference internal" href="_modules/systemetric/pacbot.html#PacBot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.pacbot.PacBot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#systemetric.robot.Robot" title="systemetric.robot.Robot"><tt class="xref py py-class docutils literal"><span class="pre">systemetric.robot.Robot</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-systemetric.robot">
+<span id="robot-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">robot</span></tt> Module<a class="headerlink" href="#module-systemetric.robot" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="systemetric.robot.Robot">
+<em class="property">class </em><tt class="descclassname">systemetric.robot.</tt><tt class="descname">Robot</tt><a class="reference internal" href="_modules/systemetric/robot.html#Robot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.robot.Robot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Magic Robot base class</p>
+<p>This class is magic. It enables and disables bits of code depending
+on which bits of the robot are present.</p>
+<p>This constructor must be called at the end of a derived class
+constructor. The derived class constructor must first set up
+any bits of the robot that are present and needed, e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">DerivedRobot</span><span class="p">(</span><span class="n">Robot</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># set up any bits of the robot here</span>
+        <span class="c"># this robot has motors and a pump</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motorDriver</span> <span class="o">=</span> <span class="n">MotorDriver</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pump</span> <span class="o">=</span> <span class="n">Pump</span><span class="p">()</span>
+
+        <span class="c"># we&#39;re done setting up</span>
+        <span class="c"># call the Robot magic constructor</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DerivedRobot</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="systemetric.robot.Robot.moveForward">
+<tt class="descname">moveForward</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/systemetric/robot.html#Robot.moveForward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.robot.Robot.moveForward" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="systemetric.robot.Robot.see">
+<tt class="descname">see</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/systemetric/robot.html#Robot.see"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.robot.Robot.see" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="systemetric.robot.Robot.setArmState">
+<tt class="descname">setArmState</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/systemetric/robot.html#Robot.setArmState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.robot.Robot.setArmState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="systemetric.robot.Robot.setPumpState">
+<tt class="descname">setPumpState</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/systemetric/robot.html#Robot.setPumpState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.robot.Robot.setPumpState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="systemetric.robot.Robot.turn">
+<tt class="descname">turn</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/systemetric/robot.html#Robot.turn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.robot.Robot.turn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="systemetric.robot.check_requires">
+<tt class="descclassname">systemetric.robot.</tt><tt class="descname">check_requires</tt><big>(</big><em>obj</em>, <em>things</em>, <em>funcName</em>, <em>className</em><big>)</big><a class="reference internal" href="_modules/systemetric/robot.html#check_requires"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.robot.check_requires" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the requirements specified by &#64;requires</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="systemetric.robot.requires">
+<tt class="descclassname">systemetric.robot.</tt><tt class="descname">requires</tt><big>(</big><em>things</em>, <em>required=False</em><big>)</big><a class="reference internal" href="_modules/systemetric/robot.html#requires"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#systemetric.robot.requires" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator factory that implements a requirement system</p>
+<p>Annotates functions that require certain members be present in
+the Robot class</p>
+<p>Use like this:</p>
+<div class="highlight-python"><pre>@requires(["vision", "visionMode"], required=True):
+def see():
+    pass</pre>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>things</strong> &#8211; a list of strings indicating the members that are
+required by the decorated function.</li>
+<li><strong>required</strong> &#8211; if <tt class="docutils literal"><span class="pre">True</span></tt>, indicates that the member is
+essential, and marks the member for checking in
+<tt class="docutils literal"><span class="pre">Robot.__init__</span></tt>. Otherwise, the member is only
+checked when a function that requires it is called</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="systemetric.devices.html">devices Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="systemetric.devices.html#id1"><tt class="docutils literal"><span class="pre">devices</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="systemetric.devices.html#module-systemetric.devices.arm"><tt class="docutils literal"><span class="pre">arm</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="systemetric.devices.html#module-systemetric.devices.mbed"><tt class="docutils literal"><span class="pre">mbed</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="systemetric.devices.html#module-systemetric.devices.motor"><tt class="docutils literal"><span class="pre">motor</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="systemetric.devices.html#module-systemetric.devices.pump"><tt class="docutils literal"><span class="pre">pump</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="systemetric.sr_devices.html">sr_devices Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="systemetric.sr_devices.html#id1"><tt class="docutils literal"><span class="pre">sr_devices</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="systemetric.sr_devices.html#module-systemetric.sr_devices.motor"><tt class="docutils literal"><span class="pre">motor</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="systemetric.sr_devices.html#module-systemetric.sr_devices.vision"><tt class="docutils literal"><span class="pre">vision</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">systemetric Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">systemetric</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-systemetric.blindmotordriver"><tt class="docutils literal"><span class="pre">blindmotordriver</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-systemetric.lifterbot"><tt class="docutils literal"><span class="pre">lifterbot</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-systemetric.pacbot"><tt class="docutils literal"><span class="pre">pacbot</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-systemetric.robot"><tt class="docutils literal"><span class="pre">robot</span></tt> Module</a></li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Systemetric sr-pi-2013 documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="systemetric.devices.html"
+                        title="next chapter">devices Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/systemetric.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="systemetric.devices.html" title="devices Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Systemetric sr-pi-2013 documentation"
+             >previous</a> |</li>
+        <li><a href="index.html">.  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Systemetric.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,358 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sr2013.vision &mdash; .  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title=".  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">.  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sr2013.vision</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">pykoki</span><span class="o">,</span> <span class="nn">threading</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">functools</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">pykoki</span> <span class="kn">import</span> <span class="n">CameraParams</span><span class="p">,</span> <span class="n">Point2Df</span><span class="p">,</span> <span class="n">Point2Di</span>
+
+<span class="n">C500_focal_length</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">1024</span><span class="p">):</span> <span class="p">(</span><span class="mf">1088.6744696128017</span><span class="p">,</span> <span class="mf">1088.6744696128017</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">800</span><span class="p">):</span> <span class="p">(</span><span class="mf">1077.3190248161634</span><span class="p">,</span> <span class="mf">1077.3190248161634</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">):</span> <span class="p">(</span><span class="mf">1087.9702553611371</span><span class="p">,</span> <span class="mf">1087.9702553611371</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">960</span><span class="p">,</span> <span class="mi">720</span><span class="p">):</span> <span class="p">(</span><span class="mf">810.09860332369828</span><span class="p">,</span> <span class="mf">810.09860332369828</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">):</span> <span class="p">(</span><span class="mf">672.49473805241894</span><span class="p">,</span> <span class="mf">672.49473805241894</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">640</span><span class="p">,</span> <span class="mi">480</span><span class="p">):</span> <span class="p">(</span><span class="mf">539.30891554396362</span><span class="p">,</span> <span class="mf">539.30891554396362</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">640</span><span class="p">,</span> <span class="mi">400</span><span class="p">):</span> <span class="p">(</span><span class="mf">536.63303379131355</span><span class="p">,</span> <span class="mf">536.63303379131355</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">640</span><span class="p">,</span> <span class="mi">360</span><span class="p">):</span> <span class="p">(</span><span class="mf">538.60066822927899</span><span class="p">,</span> <span class="mf">538.60066822927899</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">352</span><span class="p">,</span> <span class="mi">288</span><span class="p">):</span> <span class="p">(</span><span class="mf">302.3574089608714</span><span class="p">,</span> <span class="mf">302.3574089608714</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">320</span><span class="p">,</span> <span class="mi">240</span><span class="p">):</span> <span class="p">(</span><span class="mf">267.87289797043974</span><span class="p">,</span> <span class="mf">267.87289797043974</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">176</span><span class="p">,</span> <span class="mi">144</span><span class="p">):</span> <span class="p">(</span><span class="mf">145.6217107354399</span><span class="p">,</span> <span class="mf">145.6217107354399</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">160</span><span class="p">,</span> <span class="mi">120</span><span class="p">):</span> <span class="p">(</span><span class="mf">129.71444255178932</span><span class="p">,</span> <span class="mf">129.71444255178932</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">C270_focal_length</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">960</span><span class="p">):</span> <span class="p">(</span><span class="mf">1402.4129693403379</span><span class="p">,</span> <span class="mf">1402.4129693403379</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">720</span><span class="p">):</span> <span class="p">(</span><span class="mf">1403.6700720661784</span><span class="p">,</span> <span class="mf">1403.6700720661784</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">576</span><span class="p">):</span> <span class="p">(</span><span class="mf">1124.3241302755343</span><span class="p">,</span> <span class="mf">1124.3241302755343</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">960</span><span class="p">,</span> <span class="mi">720</span><span class="p">):</span>  <span class="p">(</span><span class="mf">1051.3506745692532</span><span class="p">,</span> <span class="mf">1051.3506745692532</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">960</span><span class="p">,</span> <span class="mi">544</span><span class="p">):</span>  <span class="p">(</span><span class="mf">1050.6160916576887</span><span class="p">,</span> <span class="mf">1050.6160916576887</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">864</span><span class="p">,</span> <span class="mi">480</span><span class="p">):</span>  <span class="p">(</span><span class="mf">940.64475443969184</span><span class="p">,</span> <span class="mf">940.64475443969184</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">):</span>  <span class="p">(</span><span class="mf">870.49134233524376</span><span class="p">,</span> <span class="mf">870.49134233524376</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">448</span><span class="p">):</span>  <span class="p">(</span><span class="mf">870.24502453110301</span><span class="p">,</span> <span class="mf">870.24502453110301</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">752</span><span class="p">,</span> <span class="mi">416</span><span class="p">):</span>  <span class="p">(</span><span class="mf">813.03563104383659</span><span class="p">,</span> <span class="mf">813.03563104383659</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">640</span><span class="p">,</span> <span class="mi">480</span><span class="p">):</span>  <span class="p">(</span><span class="mf">793.97214065079106</span><span class="p">,</span> <span class="mf">793.97214065079106</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">544</span><span class="p">,</span> <span class="mi">288</span><span class="p">):</span>  <span class="p">(</span><span class="mf">593.33938236047481</span><span class="p">,</span> <span class="mf">593.33938236047481</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">432</span><span class="p">,</span> <span class="mi">240</span><span class="p">):</span>  <span class="p">(</span><span class="mf">473.402174937062</span><span class="p">,</span>   <span class="mf">473.402174937062</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">352</span><span class="p">,</span> <span class="mi">288</span><span class="p">):</span>  <span class="p">(</span><span class="mf">416.51679809127182</span><span class="p">,</span> <span class="mf">416.51679809127182</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">320</span><span class="p">,</span> <span class="mi">240</span><span class="p">):</span>  <span class="p">(</span><span class="mf">396.10516141661941</span><span class="p">,</span> <span class="mf">396.10516141661941</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">320</span><span class="p">,</span> <span class="mi">176</span><span class="p">):</span>  <span class="p">(</span><span class="mf">339.97100058087398</span><span class="p">,</span> <span class="mf">339.97100058087398</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">176</span><span class="p">,</span> <span class="mi">144</span><span class="p">):</span>  <span class="p">(</span><span class="mf">204.85920172232522</span><span class="p">,</span> <span class="mf">204.85920172232522</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">160</span><span class="p">,</span> <span class="mi">120</span><span class="p">):</span>  <span class="p">(</span><span class="mf">195.20341230615605</span><span class="p">,</span> <span class="mf">195.20341230615605</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">focal_length_lut</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">(</span><span class="mh">0x046d</span><span class="p">,</span> <span class="mh">0x0807</span><span class="p">):</span> <span class="n">C500_focal_length</span><span class="p">,</span>
+    <span class="p">(</span><span class="mh">0x046d</span><span class="p">,</span> <span class="mh">0x0825</span><span class="p">):</span> <span class="n">C270_focal_length</span>
+<span class="p">}</span>
+
+<span class="n">MARKER_ARENA</span><span class="p">,</span> <span class="n">MARKER_ROBOT</span><span class="p">,</span> <span class="n">MARKER_PEDESTAL</span><span class="p">,</span> <span class="n">MARKER_TOKEN</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">marker_offsets</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">MARKER_ARENA</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">MARKER_ROBOT</span><span class="p">:</span> <span class="mi">28</span><span class="p">,</span>
+    <span class="n">MARKER_PEDESTAL</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+    <span class="n">MARKER_TOKEN</span><span class="p">:</span> <span class="mi">41</span>
+<span class="p">}</span>
+
+<span class="n">marker_sizes</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">MARKER_ARENA</span><span class="p">:</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="p">(</span><span class="mf">10.0</span><span class="o">/</span><span class="mi">12</span><span class="p">),</span>
+    <span class="n">MARKER_ROBOT</span><span class="p">:</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="p">(</span><span class="mf">10.0</span><span class="o">/</span><span class="mi">12</span><span class="p">),</span>
+    <span class="n">MARKER_PEDESTAL</span><span class="p">:</span> <span class="mf">0.2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">10.0</span><span class="o">/</span><span class="mi">12</span><span class="p">),</span>
+    <span class="n">MARKER_TOKEN</span><span class="p">:</span> <span class="mf">0.2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">10.0</span><span class="o">/</span><span class="mi">12</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">MarkerInfo</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span> <span class="s">&quot;MarkerInfo&quot;</span><span class="p">,</span> <span class="s">&quot;code marker_type offset size&quot;</span> <span class="p">)</span>
+<span class="n">ImageCoord</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span> <span class="s">&quot;ImageCoord&quot;</span><span class="p">,</span> <span class="s">&quot;x y&quot;</span> <span class="p">)</span>
+<span class="n">WorldCoord</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span> <span class="s">&quot;WorldCoord&quot;</span><span class="p">,</span> <span class="s">&quot;x y z&quot;</span> <span class="p">)</span>
+<span class="n">PolarCoord</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span> <span class="s">&quot;PolarCoord&quot;</span><span class="p">,</span> <span class="s">&quot;length rot_x rot_y&quot;</span> <span class="p">)</span>
+<span class="n">Orientation</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span> <span class="s">&quot;Orientation&quot;</span><span class="p">,</span> <span class="s">&quot;rot_x rot_y rot_z&quot;</span> <span class="p">)</span>
+<span class="n">Point</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span> <span class="s">&quot;Point&quot;</span><span class="p">,</span> <span class="s">&quot;image world polar&quot;</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="create_marker_lut"><a class="viewcode-back" href="../../sr2013.html#sr2013.vision.create_marker_lut">[docs]</a><span class="k">def</span> <span class="nf">create_marker_lut</span><span class="p">(</span><span class="n">offset</span><span class="p">):</span>
+    <span class="n">lut</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">genre</span><span class="p">,</span> <span class="n">num</span> <span class="ow">in</span> <span class="p">[</span> <span class="p">(</span> <span class="n">MARKER_ARENA</span><span class="p">,</span> <span class="mi">28</span> <span class="p">),</span>
+                        <span class="p">(</span> <span class="n">MARKER_ROBOT</span><span class="p">,</span> <span class="mi">4</span> <span class="p">),</span>
+                        <span class="p">(</span> <span class="n">MARKER_PEDESTAL</span><span class="p">,</span> <span class="mi">9</span> <span class="p">),</span>
+                        <span class="p">(</span> <span class="n">MARKER_TOKEN</span><span class="p">,</span> <span class="mi">24</span> <span class="p">)]:</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
+            <span class="n">base_code</span> <span class="o">=</span> <span class="n">marker_offsets</span><span class="p">[</span><span class="n">genre</span><span class="p">]</span> <span class="o">+</span> <span class="n">n</span>
+            <span class="n">real_code</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">base_code</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">MarkerInfo</span><span class="p">(</span> <span class="n">code</span> <span class="o">=</span> <span class="n">base_code</span><span class="p">,</span>
+                            <span class="n">marker_type</span> <span class="o">=</span> <span class="n">genre</span><span class="p">,</span>
+                            <span class="n">offset</span> <span class="o">=</span> <span class="n">n</span><span class="p">,</span>
+                            <span class="n">size</span> <span class="o">=</span> <span class="n">marker_sizes</span><span class="p">[</span><span class="n">genre</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">lut</span><span class="p">[</span><span class="n">real_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span>
+    <span class="k">return</span> <span class="n">lut</span>
+</div>
+<span class="n">marker_luts</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;dev&quot;</span><span class="p">:</span> <span class="n">create_marker_lut</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                <span class="s">&quot;comp&quot;</span><span class="p">:</span> <span class="n">create_marker_lut</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="n">MarkerBase</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span> <span class="s">&quot;Marker&quot;</span><span class="p">,</span> <span class="s">&quot;info timestamp res vertices centre orientation&quot;</span> <span class="p">)</span> 
+<div class="viewcode-block" id="Marker"><a class="viewcode-back" href="../../sr2013.html#sr2013.vision.Marker">[docs]</a><span class="k">class</span> <span class="nc">Marker</span><span class="p">(</span><span class="n">MarkerBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kwd</span> <span class="p">):</span>
+        <span class="c"># Aliases</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centre</span><span class="o">.</span><span class="n">polar</span><span class="o">.</span><span class="n">length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rot_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centre</span><span class="o">.</span><span class="n">polar</span><span class="o">.</span><span class="n">rot_y</span>
+</div>
+<div class="viewcode-block" id="Timer"><a class="viewcode-back" href="../../sr2013.html#sr2013.vision.Timer">[docs]</a><span class="k">class</span> <span class="nc">Timer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">tb</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="Vision"><a class="viewcode-back" href="../../sr2013.html#sr2013.vision.Vision">[docs]</a><span class="k">class</span> <span class="nc">Vision</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">camdev</span><span class="p">,</span> <span class="n">lib</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">koki</span> <span class="o">=</span> <span class="n">pykoki</span><span class="o">.</span><span class="n">PyKoki</span><span class="p">(</span><span class="n">lib</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_camdev</span> <span class="o">=</span> <span class="n">camdev</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_open_cam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_camdev</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camera_focal_length</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_focal_length</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t open camera: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">get_errno</span><span class="p">()</span> <span class="p">)</span>
+
+        <span class="c"># Lock for the use of the vision</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_res</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_buffers</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_streaming</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c"># Default to 800x600        </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_res</span><span class="p">(</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span><span class="mi">600</span><span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;koki&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_close_cam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_focal_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">vendor_product_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;.* ([0-9A-Za-z]+):([0-9A-Za-z]+) &quot;</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s">&quot;lsusb&quot;</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">vendor_product_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">())</span>
+            <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">focal_length_lut</span><span class="p">:</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">camera_focal_length</span> <span class="o">=</span> <span class="n">focal_length_lut</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+               <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_set_res</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">):</span>
+        <span class="s">&quot;Set the resolution of the camera if different to what we were&quot;</span>
+        <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_res</span><span class="p">:</span>
+            <span class="s">&quot;Resolution already the requested one&quot;</span>
+            <span class="k">return</span>
+
+        <span class="n">was_streaming</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_streaming</span>
+        <span class="k">if</span> <span class="n">was_streaming</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stop</span><span class="p">()</span>
+
+        <span class="c"># The camera goes into a strop if we don&#39;t close and open again</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_close_cam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_open_cam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_camdev</span><span class="p">)</span>
+
+        <span class="n">fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_create_YUYV_format</span><span class="p">(</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_set_format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+
+        <span class="n">fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_get_format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">)</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">fmt</span><span class="o">.</span><span class="n">pix</span><span class="o">.</span><span class="n">width</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">fmt</span><span class="o">.</span><span class="n">pix</span><span class="o">.</span><span class="n">height</span>
+
+        <span class="k">if</span> <span class="n">width</span> <span class="o">!=</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">height</span> <span class="o">!=</span> <span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s">&quot;Unsupported image resolution&quot;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_res</span> <span class="o">=</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">was_streaming</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_stop_stream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_free_buffers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffers</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_buffers</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_streaming</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_buffers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_prepare_buffers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span> <span class="n">pykoki</span><span class="o">.</span><span class="n">c_int</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_start_stream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_streaming</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">_width_from_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lut</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lut</span><span class="p">:</span>
+            <span class="c"># We really want to ignore these...</span>
+            <span class="k">return</span> <span class="mf">0.1</span>
+
+        <span class="k">return</span> <span class="n">lut</span><span class="p">[</span><span class="n">code</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+
+<div class="viewcode-block" id="Vision.see"><a class="viewcode-back" href="../../sr2013.html#sr2013.vision.Vision.see">[docs]</a>    <span class="k">def</span> <span class="nf">see</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">stats</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_res</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="n">acq_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="n">timer</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">()</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">with</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_get_frame_array</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffers</span> <span class="p">)</span>
+        <span class="n">times</span><span class="p">[</span><span class="s">&quot;cam&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timer</span><span class="o">.</span><span class="n">time</span>
+
+        <span class="k">with</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">v4l_YUYV_frame_to_grayscale_image</span><span class="p">(</span> <span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_res</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_res</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">times</span><span class="p">[</span><span class="s">&quot;yuyv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timer</span><span class="o">.</span><span class="n">time</span>
+
+        <span class="c"># Now that we&#39;re dealing with a copy of the image, release the camera lock</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+        <span class="n">params</span> <span class="o">=</span> <span class="n">CameraParams</span><span class="p">(</span> <span class="n">Point2Df</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">_res</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span> <span class="p">),</span>
+                               <span class="n">Point2Df</span><span class="p">(</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">camera_focal_length</span><span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">_res</span> <span class="p">]</span> <span class="p">),</span>
+                               <span class="n">Point2Di</span><span class="p">(</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_res</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="n">markers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">find_markers_fp</span><span class="p">(</span> <span class="n">img</span><span class="p">,</span>
+                                                 <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width_from_code</span><span class="p">,</span> <span class="n">marker_luts</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="p">),</span>
+                                                 <span class="n">params</span> <span class="p">)</span>
+        <span class="n">times</span><span class="p">[</span><span class="s">&quot;find_markers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timer</span><span class="o">.</span><span class="n">time</span>
+
+        <span class="n">srmarkers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">markers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">marker_luts</span><span class="p">[</span><span class="n">mode</span><span class="p">]:</span>
+                <span class="s">&quot;Ignore other sets of codes&quot;</span>
+                <span class="k">continue</span>
+
+            <span class="n">info</span> <span class="o">=</span> <span class="n">marker_luts</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">code</span><span class="p">)]</span>
+
+            <span class="n">vertices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+                <span class="n">vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">Point</span><span class="p">(</span> <span class="n">image</span> <span class="o">=</span> <span class="n">ImageCoord</span><span class="p">(</span> <span class="n">x</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                                                            <span class="n">y</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">y</span> <span class="p">),</span>
+                                        <span class="n">world</span> <span class="o">=</span> <span class="n">WorldCoord</span><span class="p">(</span> <span class="n">x</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                                                            <span class="n">y</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                                                            <span class="n">z</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">z</span> <span class="p">),</span>
+                                        <span class="c"># libkoki does not yet provide these coords</span>
+                                        <span class="n">polar</span> <span class="o">=</span> <span class="n">PolarCoord</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+            <span class="n">centre</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span> <span class="n">image</span> <span class="o">=</span> <span class="n">ImageCoord</span><span class="p">(</span> <span class="n">x</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">centre</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                                                <span class="n">y</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">centre</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">y</span> <span class="p">),</span>
+                            <span class="n">world</span> <span class="o">=</span> <span class="n">WorldCoord</span><span class="p">(</span> <span class="n">x</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">centre</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                                                <span class="n">y</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">centre</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                                                <span class="n">z</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">centre</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">z</span> <span class="p">),</span>
+                            <span class="n">polar</span> <span class="o">=</span> <span class="n">PolarCoord</span><span class="p">(</span> <span class="n">length</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span>
+                                                <span class="n">rot_x</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">bearing</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                                                <span class="n">rot_y</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">bearing</span><span class="o">.</span><span class="n">y</span> <span class="p">)</span> <span class="p">)</span>
+
+            <span class="n">orientation</span> <span class="o">=</span> <span class="n">Orientation</span><span class="p">(</span> <span class="n">rot_x</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">rotation</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                                       <span class="n">rot_y</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">rotation</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                                       <span class="n">rot_z</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">rotation</span><span class="o">.</span><span class="n">z</span> <span class="p">)</span>
+
+            <span class="n">marker</span> <span class="o">=</span> <span class="n">Marker</span><span class="p">(</span> <span class="n">info</span> <span class="o">=</span> <span class="n">info</span><span class="p">,</span>
+                             <span class="n">timestamp</span> <span class="o">=</span> <span class="n">acq_time</span><span class="p">,</span>
+                             <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="p">,</span>
+                             <span class="n">vertices</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">,</span>
+                             <span class="n">centre</span> <span class="o">=</span> <span class="n">centre</span><span class="p">,</span>
+                             <span class="n">orientation</span> <span class="o">=</span> <span class="n">orientation</span> <span class="p">)</span>
+            <span class="n">srmarkers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">koki</span><span class="o">.</span><span class="n">image_free</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stats</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">srmarkers</span><span class="p">,</span> <span class="n">times</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">srmarkers</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">.  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Systemetric.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

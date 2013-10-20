@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sr2013.pykoki &mdash; .  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title=".  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">.  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sr2013.pykoki</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">v4l2</span> <span class="kn">import</span> <span class="n">v4l2</span>
+
+<span class="n">KOKI_MARKER_GRID_WIDTH</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c">### GLib structs ###</span>
+
+<span class="c"># GLib &#39;primitive&#39; datatypes</span>
+<div class="viewcode-block" id="gchar_p"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.gchar_p">[docs]</a><span class="k">class</span> <span class="nc">gchar_p</span><span class="p">(</span><span class="n">c_char_p</span><span class="p">):</span> <span class="k">pass</span></div>
+<div class="viewcode-block" id="guint"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.guint">[docs]</a><span class="k">class</span> <span class="nc">guint</span><span class="p">(</span><span class="n">c_uint</span><span class="p">):</span> <span class="k">pass</span></div>
+<div class="viewcode-block" id="gpointer"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.gpointer">[docs]</a><span class="k">class</span> <span class="nc">gpointer</span><span class="p">(</span><span class="n">c_void_p</span><span class="p">):</span> <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="GArray"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.GArray">[docs]</a><span class="k">class</span> <span class="nc">GArray</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="n">gchar_p</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;len&quot;</span><span class="p">,</span> <span class="n">guint</span><span class="p">)]</span>
+
+</div>
+<div class="viewcode-block" id="GSList"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.GSList">[docs]</a><span class="k">class</span> <span class="nc">GSList</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span> <span class="k">pass</span></div>
+<span class="n">GSList</span><span class="o">.</span><span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="n">gpointer</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;next&quot;</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">GSList</span><span class="p">))]</span>
+
+<div class="viewcode-block" id="GPtrArray"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.GPtrArray">[docs]</a><span class="k">class</span> <span class="nc">GPtrArray</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;pdata&quot;</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">gpointer</span><span class="p">)),</span> <span class="p">(</span><span class="s">&quot;len&quot;</span><span class="p">,</span> <span class="n">guint</span><span class="p">)]</span>
+
+</div>
+<div class="viewcode-block" id="Bearing"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.Bearing">[docs]</a><span class="k">class</span> <span class="nc">Bearing</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;z&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Bearing (x=</span><span class="si">%f</span><span class="s">, y=</span><span class="si">%f</span><span class="s">, z=</span><span class="si">%f</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Point2Di"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.Point2Di">[docs]</a><span class="k">class</span> <span class="nc">Point2Di</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="n">c_uint16</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">,</span> <span class="n">c_uint16</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Point2Di (x=</span><span class="si">%d</span><span class="s">, y=</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Point2Df"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.Point2Df">[docs]</a><span class="k">class</span> <span class="nc">Point2Df</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Point2Df (x=</span><span class="si">%f</span><span class="s">, y=</span><span class="si">%f</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Point3Df"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.Point3Df">[docs]</a><span class="k">class</span> <span class="nc">Point3Df</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;z&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Point3Df (x=</span><span class="si">%f</span><span class="s">, y=</span><span class="si">%f</span><span class="s">, z=</span><span class="si">%f</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="MarkerVertex"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.MarkerVertex">[docs]</a><span class="k">class</span> <span class="nc">MarkerVertex</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;image&quot;</span><span class="p">,</span> <span class="n">Point2Df</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;world&quot;</span><span class="p">,</span> <span class="n">Point3Df</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Marker Vertex (image = </span><span class="si">%s</span><span class="s">, world = </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="MarkerRotation"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.MarkerRotation">[docs]</a><span class="k">class</span> <span class="nc">MarkerRotation</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;y&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;z&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;MarkerRotation (x=</span><span class="si">%f</span><span class="s">, y=</span><span class="si">%f</span><span class="s">, z=</span><span class="si">%f</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Marker"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.Marker">[docs]</a><span class="k">class</span> <span class="nc">Marker</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;code&quot;</span><span class="p">,</span> <span class="n">c_uint8</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;centre&quot;</span><span class="p">,</span> <span class="n">MarkerVertex</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;vertices&quot;</span><span class="p">,</span> <span class="n">MarkerVertex</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span>
+                <span class="p">(</span><span class="s">&quot;rotation_offset&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;rotation&quot;</span><span class="p">,</span> <span class="n">MarkerRotation</span><span class="p">),</span>
+                <span class="p">(</span><span class="s">&quot;bearing&quot;</span><span class="p">,</span> <span class="n">Bearing</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;distance&quot;</span><span class="p">,</span> <span class="n">c_float</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Marker (</span><span class="se">\n\t</span><span class="s">code=</span><span class="si">%d</span><span class="s">,</span><span class="se">\n\t</span><span class="s">centre = </span><span class="si">%s</span><span class="s">,</span><span class="se">\n\t</span><span class="s">bearing = </span><span class="si">%s</span><span class="s">,</span><span class="se">\n\t</span><span class="s">distance=</span><span class="si">%f</span><span class="s">,</span><span class="se">\n\t</span><span class="s">rotation = </span><span class="si">%s</span><span class="s">,</span><span class="se">\n\t</span><span class="s">rotation_offset=</span><span class="si">%f</span><span class="s">,</span><span class="se">\n\t</span><span class="s">vertices = [</span><span class="se">\n\t\t</span><span class="si">%s</span><span class="s">,</span><span class="se">\n\t\t</span><span class="si">%s</span><span class="s">,</span><span class="se">\n\t\t</span><span class="si">%s</span><span class="s">,</span><span class="se">\n\t\t</span><span class="si">%s</span><span class="s">])&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">centre</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bearing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+</div>
+<div class="viewcode-block" id="ClipRegion"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.ClipRegion">[docs]</a><span class="k">class</span> <span class="nc">ClipRegion</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;min&quot;</span><span class="p">,</span> <span class="n">Point2Di</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;max&quot;</span><span class="p">,</span> <span class="n">Point2Di</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;mass&quot;</span><span class="p">,</span> <span class="n">c_uint16</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;ClipRegion (mass=</span><span class="si">%d</span><span class="s">, min = </span><span class="si">%s</span><span class="s">, max = </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Cell"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.Cell">[docs]</a><span class="k">class</span> <span class="nc">Cell</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;sum&quot;</span><span class="p">,</span> <span class="n">c_uint</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;num_pixels&quot;</span><span class="p">,</span> <span class="n">c_uint16</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;val&quot;</span><span class="p">,</span> <span class="n">c_uint8</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Cell (num_pixels=</span><span class="si">%d</span><span class="s">, sum=</span><span class="si">%d</span><span class="s">, val=</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_pixels</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+</div>
+<span class="n">Grid</span> <span class="o">=</span> <span class="p">(</span><span class="n">Cell</span> <span class="o">*</span> <span class="n">KOKI_MARKER_GRID_WIDTH</span><span class="p">)</span> <span class="o">*</span> <span class="n">KOKI_MARKER_GRID_WIDTH</span>
+
+<div class="viewcode-block" id="GridRepr"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.GridRepr">[docs]</a><span class="k">def</span> <span class="nf">GridRepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="s">&quot;Grid:</span><span class="se">\n</span><span class="s">[&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">KOKI_MARKER_GRID_WIDTH</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">+=</span> <span class="s">&quot;[&quot;</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">KOKI_MARKER_GRID_WIDTH</span><span class="p">):</span>
+            <span class="n">ret</span> <span class="o">+=</span> <span class="s">&quot;(</span><span class="si">%d</span><span class="s">, </span><span class="si">%d</span><span class="s">, </span><span class="si">%d</span><span class="s">),</span><span class="se">\t</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">num_pixels</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">ret</span> <span class="o">+=</span> <span class="s">&quot;],</span><span class="se">\n</span><span class="s"> &quot;</span>
+
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">ret</span> <span class="o">+=</span> <span class="s">&quot;]&quot;</span>
+    <span class="k">return</span> <span class="n">ret</span>
+</div>
+<span class="n">Grid</span><span class="o">.</span><span class="n">__repr__</span> <span class="o">=</span> <span class="n">GridRepr</span>
+
+
+<div class="viewcode-block" id="CameraParams"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.CameraParams">[docs]</a><span class="k">class</span> <span class="nc">CameraParams</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;principal_point&quot;</span><span class="p">,</span> <span class="n">Point2Df</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;focal_length&quot;</span><span class="p">,</span> <span class="n">Point2Df</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;size&quot;</span><span class="p">,</span> <span class="n">Point2Di</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;CameraParams (focal_length = </span><span class="si">%s</span><span class="s">, principal_point = </span><span class="si">%s</span><span class="s">, size = </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">focal_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">principal_point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Quad"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.Quad">[docs]</a><span class="k">class</span> <span class="nc">Quad</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;vertices&quot;</span><span class="p">,</span> <span class="n">Point2Df</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;links&quot;</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">GSList</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Quad (links = [</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">], vertices = [</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">])&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+</div>
+<div class="viewcode-block" id="LabelledImage"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.LabelledImage">[docs]</a><span class="k">class</span> <span class="nc">LabelledImage</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;data&quot;</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">c_uint16</span><span class="p">)),</span>  <span class="p">(</span><span class="s">&quot;w&quot;</span><span class="p">,</span> <span class="n">c_uint16</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;h&quot;</span><span class="p">,</span> <span class="n">c_uint16</span><span class="p">),</span>
+                <span class="p">(</span><span class="s">&quot;clips&quot;</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">GArray</span><span class="p">)),</span> <span class="p">(</span><span class="s">&quot;aliases&quot;</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">GArray</span><span class="p">))]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;LabelledImage (aliases = </span><span class="si">%s</span><span class="s">, clips = </span><span class="si">%s</span><span class="s">, data = </span><span class="si">%s</span><span class="s">, w=</span><span class="si">%s</span><span class="s">, h=</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">clips</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Buffer"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.Buffer">[docs]</a><span class="k">class</span> <span class="nc">Buffer</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&quot;length&quot;</span><span class="p">,</span> <span class="n">c_size_t</span><span class="p">),</span> <span class="p">(</span><span class="s">&quot;start&quot;</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">c_uint8</span><span class="p">))]</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Buffer (length=</span><span class="si">%s</span><span class="s">, start = </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+
+</div>
+<span class="n">WIDTH_FROM_CODE_FUNC</span> <span class="o">=</span> <span class="n">CFUNCTYPE</span><span class="p">(</span><span class="n">c_float</span><span class="p">,</span> <span class="n">c_int</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PyKoki"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki">[docs]</a><span class="k">class</span> <span class="nc">PyKoki</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">libdir</span> <span class="o">=</span> <span class="s">&quot;../libkoki/lib&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_library</span><span class="p">(</span><span class="n">libdir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_library</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_load_library</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">libkoki</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s">&quot;libkoki.so&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">libkoki</span> <span class="o">=</span> <span class="n">cdll</span><span class="o">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">libkoki</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;pykoki: libkoki.so not found&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span> <span class="o">=</span> <span class="n">libkoki</span>
+
+    <span class="k">def</span> <span class="nf">_setup_library</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span>
+
+        <span class="c">### v4l.h ###</span>
+
+        <span class="c"># int koki_v4l_open_cam(const char* filename)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_open_cam</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_char_p</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_open_cam</span><span class="o">.</span><span class="n">resytpe</span> <span class="o">=</span> <span class="n">c_int</span>
+
+        <span class="c"># void koki_v4l_close_cam(int fd)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_close_cam</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+
+        <span class="c"># struct v4l2_format koki_v4l_get_format()</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_get_format</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_get_format</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">v4l2</span><span class="o">.</span><span class="n">v4l2_format</span>
+
+        <span class="c"># int koki_v4l_set_format(int fd, struct v4l2_format fmt)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_set_format</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">v4l2</span><span class="o">.</span><span class="n">v4l2_format</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_set_format</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+
+        <span class="c"># struct v4l2_format koki_v4l_create_YUYV_format(unsigned int w, unsigned int h)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_create_YUYV_format</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_uint</span><span class="p">,</span> <span class="n">c_uint</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_create_YUYV_format</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">v4l2</span><span class="o">.</span><span class="n">v4l2_format</span>
+
+        <span class="c"># void koki_v4l_print_format(struct v4l2_format fmt)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_print_format</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">v4l2</span><span class="o">.</span><span class="n">v4l2_format</span><span class="p">]</span>
+
+        <span class="c"># koki_buffer_t* koki_v4l_prepare_buffers(int fd, int *count)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_prepare_buffers</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">c_int</span><span class="p">)]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_prepare_buffers</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">Buffer</span><span class="p">)</span>
+
+        <span class="c"># void koki_v4l_free_buffers(koki_buffer_t *buffers, int count)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_free_buffers</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">Buffer</span><span class="p">),</span> <span class="n">c_int</span> <span class="p">]</span>
+
+        <span class="c"># int koki_v4l_start_stream(int fd)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_start_stream</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_start_stream</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+
+        <span class="c"># int koki_v4l_stop_stream(int fd)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_stop_stream</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_stop_stream</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+
+        <span class="c"># uint8_t* koki_v4l_get_frame_array(int fd, koki_buffer_t *buffers)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_get_frame_array</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">Buffer</span><span class="p">)]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_get_frame_array</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">c_uint8</span><span class="p">)</span>
+
+        <span class="c"># IplImage *koki_v4l_YUYV_frame_to_RGB_image(uint8_t *frame, uint16_t w, uint16_t h)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_YUYV_frame_to_RGB_image</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">POINTER</span><span class="p">(</span><span class="n">c_uint8</span><span class="p">),</span> <span class="n">c_uint16</span><span class="p">,</span> <span class="n">c_uint16</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_YUYV_frame_to_RGB_image</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+
+        <span class="c"># IplImage *koki_v4l_YUYV_frame_to_grayscale_image(uint8_t *frame, uint16_t w, uint16_t h)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_YUYV_frame_to_grayscale_image</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">POINTER</span><span class="p">(</span><span class="n">c_uint8</span><span class="p">),</span> <span class="n">c_uint16</span><span class="p">,</span> <span class="n">c_uint16</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_v4l_YUYV_frame_to_grayscale_image</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_void_p</span>
+
+        <span class="c"># GPtrArray* koki_find_markers(IplImage *frame, float marker_width,</span>
+        <span class="c">#                              koki_camera_params_t *params)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_find_markers</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">c_float</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">CameraParams</span><span class="p">)]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_find_markers</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">GPtrArray</span><span class="p">)</span>
+
+
+        <span class="c"># GPtrArray* koki_find_markers_fp(IplImage *frame, float (*fp)(int),</span>
+        <span class="c">#                                 koki_camera_params_t *params)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_find_markers_fp</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">,</span> <span class="n">WIDTH_FROM_CODE_FUNC</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">CameraParams</span><span class="p">)]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_find_markers_fp</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">GPtrArray</span><span class="p">)</span>
+
+        <span class="c"># void koki_markers_free(GPtrArray *markers)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_markers_free</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">POINTER</span><span class="p">(</span><span class="n">GPtrArray</span><span class="p">)]</span>
+
+        <span class="c"># void koki_image_free(IplImage *image)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_image_free</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_void_p</span><span class="p">]</span>
+
+        <span class="c">### crc12.h ###</span>
+
+        <span class="c"># uint16_t koki_crc12 (uint8_t input)</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_crc12</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_uint8</span><span class="p">]</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">koki_crc12</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_uint16</span>
+
+
+    <span class="k">def</span> <span class="nf">_make_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)()</span>
+        <span class="n">pointer</span><span class="p">(</span><span class="n">ret</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">o</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+<div class="viewcode-block" id="PyKoki.v4l_open_cam"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_open_cam">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_open_cam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_open_cam</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_close_cam"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_close_cam">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_close_cam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_close_cam</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_get_format"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_get_format">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_get_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_get_format</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_set_format"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_set_format">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_set_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">fmt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_set_format</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_create_YUYV_format"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_create_YUYV_format">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_create_YUYV_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_create_YUYV_format</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_print_format"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_print_format">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_print_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_print_format</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_prepare_buffers"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_prepare_buffers">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_prepare_buffers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">count_p</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_prepare_buffers</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">count_p</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_free_buffers"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_free_buffers">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_free_buffers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffers</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_free_buffers</span><span class="p">(</span> <span class="n">buffers</span><span class="p">,</span> <span class="n">count</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_start_stream"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_start_stream">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_start_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_start_stream</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_stop_stream"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_stop_stream">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_stop_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_stop_stream</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_get_frame_array"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_get_frame_array">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_get_frame_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">buffers</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_get_frame_array</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buffers</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_YUYV_frame_to_RGB_image"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_YUYV_frame_to_RGB_image">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_YUYV_frame_to_RGB_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_YUYV_frame_to_RGB_image</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.v4l_YUYV_frame_to_grayscale_image"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.v4l_YUYV_frame_to_grayscale_image">[docs]</a>    <span class="k">def</span> <span class="nf">v4l_YUYV_frame_to_grayscale_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_v4l_YUYV_frame_to_grayscale_image</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.image_free"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.image_free">[docs]</a>    <span class="k">def</span> <span class="nf">image_free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_image_free</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PyKoki.find_markers"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.find_markers">[docs]</a>    <span class="k">def</span> <span class="nf">find_markers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">marker_width</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">markers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_find_markers</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">marker_width</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">markers</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">len</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+            <span class="c"># cast the pointer tp a marker pointer, and append to a list</span>
+            <span class="c"># of actual (dereferenced) markers</span>
+            <span class="n">marker</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">markers</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">pdata</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">Marker</span><span class="p">))</span><span class="o">.</span><span class="n">contents</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_copy</span><span class="p">(</span><span class="n">marker</span><span class="p">))</span>
+
+        <span class="c"># free the markers -- we only need the Python list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_markers_free</span><span class="p">(</span><span class="n">markers</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ret</span>
+</div>
+<div class="viewcode-block" id="PyKoki.find_markers_fp"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.find_markers_fp">[docs]</a>    <span class="k">def</span> <span class="nf">find_markers_fp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">markers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_find_markers_fp</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">WIDTH_FROM_CODE_FUNC</span><span class="p">(</span><span class="n">func</span><span class="p">),</span> <span class="n">params</span><span class="p">)</span>
+
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">markers</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">len</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+            <span class="c"># cast the pointer tp a marker pointer, and append to a list</span>
+            <span class="c"># of actual (dereferenced) markers</span>
+            <span class="n">marker</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">markers</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">pdata</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">POINTER</span><span class="p">(</span><span class="n">Marker</span><span class="p">))</span><span class="o">.</span><span class="n">contents</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_copy</span><span class="p">(</span><span class="n">marker</span><span class="p">))</span>
+
+        <span class="c"># free the markers -- we only need the Python list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_markers_free</span><span class="p">(</span><span class="n">markers</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ret</span>
+</div>
+<div class="viewcode-block" id="PyKoki.crc12"><a class="viewcode-back" href="../../sr2013.html#sr2013.pykoki.PyKoki.crc12">[docs]</a>    <span class="k">def</span> <span class="nf">crc12</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">libkoki</span><span class="o">.</span><span class="n">koki_crc12</span><span class="p">(</span><span class="n">n</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">.  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Systemetric.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

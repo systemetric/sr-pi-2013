@@ -1,0 +1,214 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>systemetric.robot &mdash; .  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title=".  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">.  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for systemetric.robot</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<div class="viewcode-block" id="check_requires"><a class="viewcode-back" href="../../systemetric.html#systemetric.robot.check_requires">[docs]</a><span class="k">def</span> <span class="nf">check_requires</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">things</span><span class="p">,</span> <span class="n">funcName</span><span class="p">,</span> <span class="n">className</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check the requirements specified by @requires&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">thing</span> <span class="ow">in</span> <span class="n">things</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s">&quot;`{}` object (required by `{c}.{f}`) &quot;</span>
+                    <span class="s">&quot;not initialised in {c}&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">funcName</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">className</span><span class="p">))</span>
+    <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="requires"><a class="viewcode-back" href="../../systemetric.html#systemetric.robot.requires">[docs]</a><span class="k">def</span> <span class="nf">requires</span><span class="p">(</span><span class="n">things</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decorator factory that implements a requirement system</span>
+
+<span class="sd">    Annotates functions that require certain members be present in</span>
+<span class="sd">    the Robot class</span>
+
+<span class="sd">    Use like this::</span>
+
+<span class="sd">        @requires([&quot;vision&quot;, &quot;visionMode&quot;], required=True):</span>
+<span class="sd">        def see():</span>
+<span class="sd">            pass</span>
+
+<span class="sd">    :param things:   a list of strings indicating the members that are</span>
+<span class="sd">                     required by the decorated function.</span>
+<span class="sd">    :param required: if ``True``, indicates that the member is</span>
+<span class="sd">                     essential, and marks the member for checking in</span>
+<span class="sd">                     ``Robot.__init__``. Otherwise, the member is only</span>
+<span class="sd">                     checked when a function that requires it is called</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">do_decorate</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">decorated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">requiresError</span> <span class="o">=</span> <span class="n">check_requires</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">things</span><span class="p">,</span> <span class="n">func</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">requiresError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">requiresError</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">decorated</span><span class="o">.</span><span class="n">_requiresData</span> <span class="o">=</span> <span class="p">(</span><span class="n">things</span><span class="p">,</span> <span class="n">required</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decorated</span>
+
+    <span class="k">return</span> <span class="n">do_decorate</span>
+</div>
+<div class="viewcode-block" id="Robot"><a class="viewcode-back" href="../../systemetric.html#systemetric.robot.Robot">[docs]</a><span class="k">class</span> <span class="nc">Robot</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Magic Robot base class</span>
+
+<span class="sd">    This class is magic. It enables and disables bits of code depending</span>
+<span class="sd">    on which bits of the robot are present.</span>
+
+<span class="sd">    This constructor must be called at the end of a derived class</span>
+<span class="sd">    constructor. The derived class constructor must first set up</span>
+<span class="sd">    any bits of the robot that are present and needed, e.g.::</span>
+
+<span class="sd">        class DerivedRobot(Robot):</span>
+<span class="sd">            def __init__(self):</span>
+<span class="sd">                # set up any bits of the robot here</span>
+<span class="sd">                # this robot has motors and a pump</span>
+<span class="sd">                self.motorDriver = MotorDriver()</span>
+<span class="sd">                self.pump = Pump()</span>
+
+<span class="sd">                # we&#39;re done setting up</span>
+<span class="sd">                # call the Robot magic constructor</span>
+<span class="sd">                super(DerivedRobot, self).__init__()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialise the magic.</span>
+
+<span class="sd">        This constructor must be called at the end of a derived class</span>
+<span class="sd">        constructor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">className</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">className</span><span class="p">)</span>
+
+        <span class="c"># check requires</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="n">things</span><span class="p">,</span> <span class="n">required</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s">&quot;_requiresData&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">requiresError</span> <span class="o">=</span> <span class="n">check_requires</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">things</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">className</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">requiresError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">required</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Required &quot;</span> <span class="o">+</span> <span class="n">requiresError</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Optional &quot;</span> <span class="o">+</span> <span class="n">requiresError</span><span class="p">)</span>
+
+    <span class="nd">@requires</span><span class="p">([</span><span class="s">&quot;motorDriver&quot;</span><span class="p">],</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="viewcode-block" id="Robot.turn"><a class="viewcode-back" href="../../systemetric.html#systemetric.robot.Robot.turn">[docs]</a>    <span class="k">def</span> <span class="nf">turn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Turn around on the spot&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motorDriver</span><span class="o">.</span><span class="n">turn</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+</div>
+    <span class="nd">@requires</span><span class="p">([</span><span class="s">&quot;motorDriver&quot;</span><span class="p">],</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="viewcode-block" id="Robot.moveForward"><a class="viewcode-back" href="../../systemetric.html#systemetric.robot.Robot.moveForward">[docs]</a>    <span class="k">def</span> <span class="nf">moveForward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Move forward a certain distance&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motorDriver</span><span class="o">.</span><span class="n">moveForward</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+
+</div>
+    <span class="nd">@requires</span><span class="p">([</span><span class="s">&quot;arm&quot;</span><span class="p">])</span>
+<div class="viewcode-block" id="Robot.setArmState"><a class="viewcode-back" href="../../systemetric.html#systemetric.robot.Robot.setArmState">[docs]</a>    <span class="k">def</span> <span class="nf">setArmState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arm</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+</div>
+    <span class="nd">@requires</span><span class="p">([</span><span class="s">&quot;pump&quot;</span><span class="p">])</span>
+<div class="viewcode-block" id="Robot.setPumpState"><a class="viewcode-back" href="../../systemetric.html#systemetric.robot.Robot.setPumpState">[docs]</a>    <span class="k">def</span> <span class="nf">setPumpState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pump</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+</div>
+    <span class="nd">@requires</span><span class="p">([</span><span class="s">&quot;vision&quot;</span><span class="p">,</span> <span class="s">&quot;visionMode&quot;</span><span class="p">])</span>
+<div class="viewcode-block" id="Robot.see"><a class="viewcode-back" href="../../systemetric.html#systemetric.robot.Robot.see">[docs]</a>    <span class="k">def</span> <span class="nf">see</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span><span class="mi">600</span><span class="p">),</span> <span class="n">stats</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;See markers</span>
+
+<span class="sd">        :param res: The resolution of the image to take with the camera</span>
+<span class="sd">        :param stats: return additional statistics along with the</span>
+<span class="sd">                      result, in a tuple&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision</span><span class="o">.</span><span class="n">see</span><span class="p">(</span> <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="p">,</span>
+                                <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visionMode</span><span class="p">,</span>
+                                <span class="n">stats</span> <span class="o">=</span> <span class="n">stats</span> <span class="p">)</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">.  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Systemetric.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
