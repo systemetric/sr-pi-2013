@@ -4,9 +4,10 @@ from sr2013 import VisionShim
 from devices import Mbed, MotorMbed, Arm, Pump
 
 class PacBot(Robot):
-    def __init__(self, mode):
+    def __init__(self, visionMode):
         self.mbed = Mbed('/dev/ttyACM0', 115200)
         self.vision = VisionShim('/dev/video0', '/usr/lib/arm-linux-gnueabihf')
+        self.visionMode = visionMode
         self.leftMotor = MotorMbed(self.mbed, 0)
         self.rightMotor = MotorMbed(self.mbed, 1)
         self.motorDriver = BlindMotorDriver(self.leftMotor, self.rightMotor,
